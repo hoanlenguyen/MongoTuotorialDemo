@@ -8,14 +8,12 @@ namespace MongoTutorialDemo.Services
 {
     public class BookService
     {
+        const string collectionName = "Books";
         private readonly IMongoCollection<Book> _books;
-
-        public BookService(IMongoDbConnectionSettings settings)
+        
+        public BookService( MongoDbContext mongoDb)
         {
-            var client = new MongoClient(settings.ConnectionString);
-            var database = client.GetDatabase(settings.DatabaseName);
-            _books = database.GetCollection<Book>(settings.CollectionName);
-
+            _books = mongoDb.Database.GetCollection<Book>(collectionName);
         }
 
         public List<Book> Get() =>

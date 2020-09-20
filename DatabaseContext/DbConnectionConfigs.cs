@@ -7,6 +7,6 @@ namespace MongoTutorialDemo.DatabaseContext
 {
     public static class DbConnectionConfigs
     {
-        public const string MongoDBConnectionSetting = "MongoDBConnectionSetting";
+        public const string MongoDBConnectionSetting = "MongoDbConnectionSettings";
     }
 }

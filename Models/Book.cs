@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MongoTutorialDemo.Models
 {
-    public class Book
+    public class Book : Entity
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
