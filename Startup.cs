@@ -33,7 +33,7 @@ namespace MongoTutorialDemo
             services.AddSingleton<MongoDbContext>();
             //services.AddSingleton<MongoDbContext>(InitializeMongoDb(Configuration.GetSection("MongoDbConnectionSettings")));
 
-            services.AddSingleton<BookService>();
+            services.AddScoped<BookService>();
 
             services.AddControllers()
                     //.AddNewtonsoftJson(options => options.UseMemberCasing())

@@ -42,6 +42,20 @@ namespace MongoTutorialDemo.Controllers
             return Ok(books);
         }
 
+        [HttpGet("{key}")]
+        public IActionResult GetByNameKey(string key)
+        {
+            var books = _bookService.FindByNamekey(key);
+
+            return Ok(books);
+        }
+
+        [HttpGet("BulkInsert")]
+        public IActionResult BulkInsert()
+        {
+            return Ok(_bookService.BulkInsert());
+        }
+
         [HttpPost]
         public ActionResult<Book> Create(Book book)
         {
@@ -65,6 +79,13 @@ namespace MongoTutorialDemo.Controllers
             return NoContent();
         }
 
+        [HttpPut("BulkUpdate")]
+        public IActionResult BulkUpdate(string oldName, string newName)
+        {
+            
+            return Ok(_bookService.BulkUpdate(oldName, newName));
+        }
+
         [HttpDelete("{id:length(24)}")]
         public IActionResult Delete(string id)
         {
@@ -78,6 +99,12 @@ namespace MongoTutorialDemo.Controllers
             _bookService.Remove(book.Id);
 
             return NoContent();
+        }
+
+        [HttpDelete("all")]
+        public IActionResult DeleteAll()
+        {
+            return Ok(_bookService.BulkDelete());
         }
 
 
