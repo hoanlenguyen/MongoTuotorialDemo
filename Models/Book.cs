@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace MongoTutorialDemo.Models
@@ -12,13 +13,22 @@ namespace MongoTutorialDemo.Models
         [MaxLength(24)]
         public string Id { get; set; }
 
-        [BsonElement("Name")]
+        [JsonProperty("title")]
         public string BookName { get; set; }
 
-        public decimal Price { get; set; }
+        public string MainGenre { get; set; }
 
-        public string Category { get; set; }
+        public List<string> SubGenres { get; set; } = new List<string>();
 
+        [JsonProperty("author")]
         public string Author { get; set; }
+
+        [JsonProperty("publisher")]
+        public string Publisher { get; set; }
+
+        [JsonProperty("book_image")]
+        public string BookCoverUrl { get; set; }
+
+        public decimal Rate { get; set; }
     }
 }

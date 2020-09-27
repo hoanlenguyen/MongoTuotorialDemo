@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MongoTutorialDemo.DatabaseContext;
 using MongoTutorialDemo.Models;
 using MongoTutorialDemo.Services;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MongoTutorialDemo.Controllers
 {
@@ -34,10 +34,10 @@ namespace MongoTutorialDemo.Controllers
             return book;
         }
 
-        [HttpGet("category/{category}")]
-        public IActionResult GetByCategory(string category)
+        [HttpGet("genre/{genre}")]
+        public IActionResult GetByCategory(string genre)
         {
-            var books = _bookService.GetByCategory(category);
+            var books = _bookService.GetByCategory(genre);
 
             return Ok(books);
         }
@@ -51,9 +51,9 @@ namespace MongoTutorialDemo.Controllers
         }
 
         [HttpGet("BulkInsert")]
-        public IActionResult BulkInsert()
+        public async Task<IActionResult> BulkInsert()
         {
-            return Ok(_bookService.BulkInsert());
+            return Ok(await _bookService.BulkInsert());
         }
 
         [HttpPost]
@@ -82,7 +82,6 @@ namespace MongoTutorialDemo.Controllers
         [HttpPut("BulkUpdate")]
         public IActionResult BulkUpdate(string oldName, string newName)
         {
-            
             return Ok(_bookService.BulkUpdate(oldName, newName));
         }
 
@@ -101,12 +100,10 @@ namespace MongoTutorialDemo.Controllers
             return NoContent();
         }
 
-        [HttpDelete("all")]
+        [HttpDelete("BulkDelete")]
         public IActionResult DeleteAll()
         {
             return Ok(_bookService.BulkDelete());
         }
-
-
     }
 }
