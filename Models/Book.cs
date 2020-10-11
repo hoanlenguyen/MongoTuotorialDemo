@@ -1,19 +1,16 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoTutorialDemo.Models.BaseEntities;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace MongoTutorialDemo.Models
 {
-    public class Book : Entity
-    {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        [MaxLength(24)]
-        public string Id { get; set; }
-
-        [JsonProperty("title")]
+    public class Book : MongoEntity
+    {        
+        [BsonElement("Name")]
+        [JsonProperty("name")]
         public string BookName { get; set; }
 
         public string MainGenre { get; set; }

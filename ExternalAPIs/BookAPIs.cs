@@ -22,7 +22,7 @@ namespace MongoTutorialDemo.ExternalAPIs
             return fields.Select(x => x.GetValue(null).ToString());
         }
 
-        public static async Task<List<Book>> GetBooks()
+        public static async Task<List<Book>> GetBooks(DateTime? date = null)
         {
             var client = new HttpClient();
             var list = new List<Book>();
@@ -43,7 +43,7 @@ namespace MongoTutorialDemo.ExternalAPIs
                             book.SubGenres.AddRange(GenreList.GetRandomGenres());
                             book.Rate = GetRandomNumber(3, 5);
                             book.Rate = GetRandomNumber(3, 5);
-                            book.BookName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(book.BookName.ToLower());
+                            book.BookName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(book.BookName.ToLower());                            
                         }
                         list.AddRange(books);
                     }

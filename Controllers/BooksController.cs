@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MongoTutorialDemo.Models;
+using MongoTutorialDemo.Models.Paging;
 using MongoTutorialDemo.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -50,12 +51,6 @@ namespace MongoTutorialDemo.Controllers
             return Ok(books);
         }
 
-        [HttpGet("BulkInsert")]
-        public async Task<IActionResult> BulkInsert()
-        {
-            return Ok(await _bookService.BulkInsert());
-        }
-
         [HttpPost]
         public ActionResult<Book> Create(Book book)
         {
@@ -79,12 +74,6 @@ namespace MongoTutorialDemo.Controllers
             return NoContent();
         }
 
-        [HttpPut("BulkUpdate")]
-        public IActionResult BulkUpdate(string oldName, string newName)
-        {
-            return Ok(_bookService.BulkUpdate(oldName, newName));
-        }
-
         [HttpDelete("{id:length(24)}")]
         public IActionResult Delete(string id)
         {
@@ -98,6 +87,24 @@ namespace MongoTutorialDemo.Controllers
             _bookService.Remove(book.Id);
 
             return NoContent();
+        }
+
+        [HttpPost("paging")]
+        public IActionResult Paging([FromForm] PagingRequest request)
+        {
+            return Ok(_bookService.PageIndexingItems(request));
+        }
+
+        [HttpGet("BulkInsert")]
+        public async Task<IActionResult> BulkInsert()
+        {
+            return Ok(await _bookService.BulkInsert());
+        }
+
+        [HttpPut("BulkUpdate")]
+        public IActionResult BulkUpdate(string oldName, string newName)
+        {
+            return Ok(_bookService.BulkUpdate(oldName, newName));
         }
 
         [HttpDelete("BulkDelete")]

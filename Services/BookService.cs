@@ -3,6 +3,8 @@ using MongoTutorialDemo.DatabaseContext;
 using MongoTutorialDemo.Enums;
 using MongoTutorialDemo.ExternalAPIs;
 using MongoTutorialDemo.Models;
+using MongoTutorialDemo.Models.Paging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -71,55 +73,30 @@ namespace MongoTutorialDemo.Services
             return true;
         }
 
-        //private async Task<List<Book>> GetRadomBooks(int count)
-        //{
-        //    var books = new List<Book>();
-        //    var images = await GetRandomImageUrlList(count);
-        //    var random = new Random();
-        //    for (int i = 0; i < count; i++)
-        //    {
-        //        books.Add(new Book
-        //        {
-        //            BookName = GetRandomString(random.Next(20, 50)),
-        //            Price = GetRandomNumber(10, 20, random),
-        //            Author = images[i].Author,
-        //            BookCoverUrl = images[i].DownloadUrl,
-        //            Categories = GetRandomCategories(random)
-        //        });
-        //    }
+        public PagingResult PageIndexingItems(PagingRequest request)
+        {
+            var items = _books.Find(book => true);
+            //if(!string.IsNullOrEmpty(request.OrderBy))
+            //    items=items.SortBy(x=>typeof(Book).GetField(request.OrderBy));
+            var count = items.Count();
+            if (request.CurrentPage == null || request.ItemsPerPage == null)
+                return new PagingResult { Items = items.ToEnumerable() };
 
-        //    return books;
-        //}
+            var maxPage = Math.Ceiling((double)count / request.ItemsPerPage.Value);
+            var result = new PagingResult()
+            {
+                CurrentPage = request.CurrentPage,
+                ItemsPerPage = request.ItemsPerPage,
+                MaxItemCount = count
+            };
 
-        
+            if (request.CurrentPage <= maxPage)
+            {
+                var skipItems = (request.CurrentPage-1) * request.ItemsPerPage;
+                result.Items = items.Skip(skipItems).Limit(request.ItemsPerPage).ToEnumerable();
+            }
 
-        //private string GetRandomString(int length)
-        //{
-        //    var random = new Random();
-        //    const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789 ";
-
-        //    var rawStr= new string(Enumerable.Repeat(chars, length)
-        //            .Select(s => s[random.Next(s.Length)]).ToArray()).ToLower();
-
-        //    return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(rawStr);
-        //}
-
-        //private decimal GetRandomNumber(double minimum, double maximum, Random random/* = null*/)
-        //{
-        //    //random ??= new Random();
-        //    var num= random.NextDouble() * (maximum - minimum) + minimum;
-        //    return (decimal)Math.Ceiling(num * 100) / 100;
-        //}
-
-        //private async Task<List<ImageItem>> GetRandomImageUrlList(int count)
-        //{
-        //    var client = new HttpClient();
-        //    var url = $"https://picsum.photos/v2/list?limit={count}";
-        //    HttpResponseMessage response = await client.GetAsync(url);
-        //    response.EnsureSuccessStatusCode();
-        //    var result = await response.Content.ReadAsStringAsync();
-        //    var objs = JsonConvert.DeserializeObject<List<ImageItem>>(result);
-        //    return objs;
-        //}
+            return result;
+        }
     }
 }
