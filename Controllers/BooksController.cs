@@ -2,6 +2,7 @@
 using MongoTutorialDemo.Models;
 using MongoTutorialDemo.Models.Paging;
 using MongoTutorialDemo.Services;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -96,9 +97,9 @@ namespace MongoTutorialDemo.Controllers
         }
 
         [HttpGet("BulkInsert")]
-        public async Task<IActionResult> BulkInsert()
+        public async Task<IActionResult> BulkInsert(DateTime? date)
         {
-            return Ok(await _bookService.BulkInsert());
+            return Ok(await _bookService.BulkInsert(date));
         }
 
         [HttpPut("BulkUpdate")]

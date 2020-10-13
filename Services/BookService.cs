@@ -52,9 +52,9 @@ namespace MongoTutorialDemo.Services
         public void Remove(string id) =>
             _books.DeleteOne(book => book.Id == id);
 
-        public async Task<bool> BulkInsert()
+        public async Task<bool> BulkInsert(DateTime? date=null)
         {
-            var books = await BookAPIs.GetBooks();
+            var books = await BookAPIs.GetBooks(date);
             _books.InsertMany(books);
             return true;
         }
@@ -80,7 +80,7 @@ namespace MongoTutorialDemo.Services
             //    items=items.SortBy(x=>typeof(Book).GetField(request.OrderBy));
             var count = items.Count();
             if (request.CurrentPage == null || request.ItemsPerPage == null)
-                return new PagingResult { Items = items.ToEnumerable() };
+                return new PagingResult { Items = items.ToEnumerable(), MaxItemCount = count };
 
             var maxPage = Math.Ceiling((double)count / request.ItemsPerPage.Value);
             var result = new PagingResult()

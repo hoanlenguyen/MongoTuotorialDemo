@@ -10,7 +10,7 @@ namespace MongoTutorialDemo.Models
     public class Book : MongoEntity
     {        
         [BsonElement("Name")]
-        [JsonProperty("name")]
+        [JsonProperty("title")]
         public string BookName { get; set; }
 
         public string MainGenre { get; set; }
