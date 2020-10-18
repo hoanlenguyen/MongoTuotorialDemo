@@ -27,9 +27,11 @@ namespace MongoTutorialDemo.ExternalAPIs
             var client = new HttpClient();
             var list = new List<Book>();
             var genres = GetBookGenres();
+            date ??= DateTime.UtcNow;
+            var dateStr = date?.ToString("yyyy-MM-dd");
             foreach (var genre in genres)
             {
-                var url = $"https://api.nytimes.com/svc/books/v3/lists/2020-01-01/{genre}.json?api-key={apiKey}";
+                var url = $"https://api.nytimes.com/svc/books/v3/lists/{dateStr}/{genre}.json?api-key={apiKey}";
                 HttpResponseMessage response = await client.GetAsync(url);
                 if (response.IsSuccessStatusCode)
                 {
@@ -40,6 +42,8 @@ namespace MongoTutorialDemo.ExternalAPIs
                         foreach (var book in books)
                         {
                             book.MainGenre = genre;
+                            book.Meta = new Models.BaseEntities.Meta();
+                            book.Meta.CreatedAt = DateTime.UtcNow.AddHours(7);
                             book.SubGenres.AddRange(GenreList.GetRandomGenres());
                             book.Rate = GetRandomNumber(3, 5);
                             book.Rate = GetRandomNumber(3, 5);

@@ -7,7 +7,7 @@ namespace MongoTutorialDemo.Models.BaseEntities
     public class Meta
     {
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow.AddHours(7);
+        public DateTime? CreatedAt { get; set; } /*= DateTime.UtcNow.AddHours(7);*/
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string CreatedBy { get; set; }

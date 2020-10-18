@@ -2,6 +2,7 @@
 using MongoTutorialDemo.Models;
 using MongoTutorialDemo.Models.Paging;
 using MongoTutorialDemo.Services;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -90,15 +91,15 @@ namespace MongoTutorialDemo.Controllers
         }
 
         [HttpPost("paging")]
-        public IActionResult Paging([FromForm] PagingRequest request)
+        public IActionResult Paging([FromForm] PagingRequest request, [FromForm] BookFilter filter)
         {
-            return Ok(_bookService.PageIndexingItems(request));
+            return Ok(_bookService.PageIndexingItems(request, filter));
         }
 
         [HttpGet("BulkInsert")]
-        public async Task<IActionResult> BulkInsert()
+        public async Task<IActionResult> BulkInsert(DateTime? date)
         {
-            return Ok(await _bookService.BulkInsert());
+            return Ok(await _bookService.BulkInsert(date));
         }
 
         [HttpPut("BulkUpdate")]

@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using MongoTutorialDemo.DatabaseContext;
 using MongoTutorialDemo.Enums;
 using MongoTutorialDemo.ExternalAPIs;
@@ -14,8 +15,6 @@ namespace MongoTutorialDemo.Services
     public class BookService
     {
         private const string _collectionName = "Books";
-
-        List<string> _genres => GenreList.Names;
 
         private readonly IMongoCollection<Book> _books;
 
@@ -52,9 +51,9 @@ namespace MongoTutorialDemo.Services
         public void Remove(string id) =>
             _books.DeleteOne(book => book.Id == id);
 
-        public async Task<bool> BulkInsert()
+        public async Task<bool> BulkInsert(DateTime? date = null)
         {
-            var books = await BookAPIs.GetBooks();
+            var books = await BookAPIs.GetBooks(date);
             _books.InsertMany(books);
             return true;
         }
@@ -73,16 +72,15 @@ namespace MongoTutorialDemo.Services
             return true;
         }
 
-        public PagingResult PageIndexingItems(PagingRequest request)
+        public PagingResult PageIndexingItems(PagingRequest request, BookFilter filter)
         {
-            var items = _books.Find(book => true);
-            //if(!string.IsNullOrEmpty(request.OrderBy))
-            //    items=items.SortBy(x=>typeof(Book).GetField(request.OrderBy));
-            var count = items.Count();
-            if (request.CurrentPage == null || request.ItemsPerPage == null)
-                return new PagingResult { Items = items.ToEnumerable() };
+            var (items, count) = FilteredMongoCollection(filter);
 
-            var maxPage = Math.Ceiling((double)count / request.ItemsPerPage.Value);
+            if (request.CurrentPage == null || request.ItemsPerPage == null)
+                return new PagingResult { Items = items.ToEnumerable(), MaxItemCount = count };
+            
+            var maxPage = (int)Math.Ceiling((double)count / request.ItemsPerPage.Value);
+
             var result = new PagingResult()
             {
                 CurrentPage = request.CurrentPage,
@@ -90,13 +88,25 @@ namespace MongoTutorialDemo.Services
                 MaxItemCount = count
             };
 
-            if (request.CurrentPage <= maxPage)
+            if (request.CurrentPage !=null && request.CurrentPage <= maxPage)
             {
-                var skipItems = (request.CurrentPage-1) * request.ItemsPerPage;
+                var skipItems =(request.CurrentPage.Value - 1) * request.ItemsPerPage;
                 result.Items = items.Skip(skipItems).Limit(request.ItemsPerPage).ToEnumerable();
             }
 
             return result;
+        }
+
+        private (IFindFluent<Book,Book> Items, long Count) FilteredMongoCollection(BookFilter input)
+        {
+            var combineFilters = Builders<Book>.Filter.And(new FilterDefinition<Book>[]{
+                Builders<Book>.Filter.Gt(nameof(Book.Rate), input.Rate),
+                Builders<Book>.Filter.Regex(nameof(Book.BookName), new BsonRegularExpression("* *"))
+            });
+
+            var items = _books.Find(combineFilters);
+
+            return (items, items.CountDocuments());
         }
     }
 }

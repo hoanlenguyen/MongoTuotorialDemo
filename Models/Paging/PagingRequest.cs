@@ -8,9 +8,6 @@ namespace MongoTutorialDemo.Models.Paging
         public int? CurrentPage { get; set; }
 
         [JsonProperty(PropertyName = "itemsPerPage")]
-        public int? ItemsPerPage { get; set; }
-
-        [JsonProperty(PropertyName = "orderBy", NullValueHandling = NullValueHandling.Ignore)]
-        public string OrderBy { get; set; }
+        public int? ItemsPerPage { get; set; }       
     }
 }
