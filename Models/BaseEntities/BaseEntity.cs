@@ -2,6 +2,6 @@
 {
     public class BaseEntity
     {
-        public Meta Meta { get; set; }
+        public Meta Meta { get; set; } = new Meta();
     }
 }
