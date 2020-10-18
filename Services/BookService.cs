@@ -1,7 +1,6 @@
-﻿using MongoDB.Bson;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using MongoTutorialDemo.DatabaseContext;
-using MongoTutorialDemo.Enums;
+using MongoTutorialDemo.Extensions;
 using MongoTutorialDemo.ExternalAPIs;
 using MongoTutorialDemo.Models;
 using MongoTutorialDemo.Models.Paging;
@@ -74,39 +73,54 @@ namespace MongoTutorialDemo.Services
 
         public PagingResult PageIndexingItems(PagingRequest request, BookFilter filter)
         {
-            var (items, count) = FilteredMongoCollection(filter);
-
             if (request.CurrentPage == null || request.ItemsPerPage == null)
-                return new PagingResult { Items = items.ToEnumerable(), MaxItemCount = count };
-            
-            var maxPage = (int)Math.Ceiling((double)count / request.ItemsPerPage.Value);
+            {
+                var (item1, count1) = FilteredMongoCollection(filter);
+                return new PagingResult
+                {
+                    Items = item1,
+                    MaxItemCount = count1
+                };
+            }
+            var skipItems = (request.CurrentPage.Value - 1) * request.ItemsPerPage.Value;
 
-            var result = new PagingResult()
+            var (item, count) = FilteredMongoCollection(filter, skipItems, request.ItemsPerPage.Value);
+
+            //var maxPage = (int)Math.Ceiling((double)count / request.ItemsPerPage.Value);
+
+            return new PagingResult
             {
                 CurrentPage = request.CurrentPage,
                 ItemsPerPage = request.ItemsPerPage,
-                MaxItemCount = count
+                MaxItemCount = count,
+                Items = item
             };
-
-            if (request.CurrentPage !=null && request.CurrentPage <= maxPage)
-            {
-                var skipItems =(request.CurrentPage.Value - 1) * request.ItemsPerPage;
-                result.Items = items.Skip(skipItems).Limit(request.ItemsPerPage).ToEnumerable();
-            }
-
-            return result;
         }
 
-        private (IFindFluent<Book,Book> Items, long Count) FilteredMongoCollection(BookFilter input)
+        private (IEnumerable<Book> Items, int Count) FilteredMongoCollection(BookFilter filter, int? skip = null, int? take = null)
         {
-            var combineFilters = Builders<Book>.Filter.And(new FilterDefinition<Book>[]{
-                Builders<Book>.Filter.Gt(nameof(Book.Rate), input.Rate),
-                Builders<Book>.Filter.Regex(nameof(Book.BookName), new BsonRegularExpression("* *"))
-            });
+            var items = _books.AsQueryable()
+                        .WhereIf(filter.BookName.HasValue(), x=>x.BookName.Contains(filter.BookName))
+                        .Where(x => filter.Rate == null || x.Rate >= filter.Rate)
+                        ;
 
-            var items = _books.Find(combineFilters);
+            var count = items.Count<Book>();
 
-            return (items, items.CountDocuments());
+            if (skip.HasValue)
+                items = items.Skip(skip.Value);
+
+            if (take.HasValue)
+                items = items.Take(take.Value);
+
+            return (items, count);
+        }
+
+        private bool ValidateFilter(string value, string key)
+        {
+            if (string.IsNullOrEmpty(key))
+                return true;
+
+            return value.Contains(key);
         }
     }
 }

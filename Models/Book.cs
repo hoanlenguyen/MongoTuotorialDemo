@@ -3,12 +3,11 @@ using MongoDB.Bson.Serialization.Attributes;
 using MongoTutorialDemo.Models.BaseEntities;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace MongoTutorialDemo.Models
 {
     public class Book : MongoEntity
-    {        
+    {
         [BsonElement("Name")]
         [JsonProperty("title")]
         public string BookName { get; set; }

@@ -12,8 +12,10 @@ namespace MongoTutorialDemo.Models.Paging
 
         public IEnumerable Items { get; set; }
 
-        public bool HasNextPage => MaxItemCount >= CurrentPage * ItemsPerPage;
+        public bool HasNextPage => (CurrentPage != null && ItemsPerPage != null) ?
+                                    MaxItemCount >= (CurrentPage * ItemsPerPage)
+                                    : false;
 
-        public bool HasPreviousPage => CurrentPage > 1;
+        public bool HasPreviousPage => CurrentPage.GetValueOrDefault() > 1;
     }
 }
