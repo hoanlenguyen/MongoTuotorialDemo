@@ -30,7 +30,7 @@ namespace MongoTutorialDemo.Enums
                 index = random.Next(1, max);
                 result.Add(Names[index]);
             }
-            return result.Distinct().ToList(); ;
+            return result.Distinct().ToList(); 
         }
     }
 }

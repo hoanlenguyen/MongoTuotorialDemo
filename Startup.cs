@@ -4,10 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using MongoDB.Driver;
 using MongoTutorialDemo.DatabaseContext;
-using MongoTutorialDemo.Models;
-using MongoTutorialDemo.Services;
+using MongoTutorialDemo.Extensions;
+
 namespace MongoTutorialDemo
 {
     public class Startup
@@ -31,13 +30,12 @@ namespace MongoTutorialDemo
                         sp.GetRequiredService<IOptions<MongoDbConnectionSettings>>().Value);
 
             services.AddSingleton<MongoDbContext>();
-            //services.AddSingleton<MongoDbContext>(InitializeMongoDb(Configuration.GetSection("MongoDbConnectionSettings")));
 
-            services.AddScoped<BookService>();
+            services.AddBusinessService();
 
-            services.AddControllers()
-                    //.AddNewtonsoftJson(options => options.UseMemberCasing())
-                    ;
+            services.AddVehicleService();
+
+            services.AddControllers();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -66,6 +64,7 @@ namespace MongoTutorialDemo
                 endpoints.MapControllers();
             });
         }
+
         //private static MongoDbContext InitializeMongoDb(IConfigurationSection configurationSection)
         //{
         //    var connectionString= configurationSection.GetSection("ConnectionString").Value;

@@ -91,9 +91,9 @@ namespace MongoTutorialDemo.Controllers
         }
 
         [HttpPost("paging")]
-        public IActionResult Paging([FromForm] PagingRequest request)
+        public IActionResult Paging([FromForm] PagingRequest request, [FromForm] BookFilter filter)
         {
-            return Ok(_bookService.PageIndexingItems(request));
+            return Ok(_bookService.PageIndexingItems(request, filter));
         }
 
         [HttpGet("BulkInsert")]
