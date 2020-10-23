@@ -1,10 +1,26 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using MongoTutorialDemo.DatabaseContext;
 using MongoTutorialDemo.Services;
 
 namespace MongoTutorialDemo.Extensions
 {
     public static class ServiceExtension
     {
+        public static IServiceCollection AddMongoDbContext(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<MongoDbConnectionSettings>(
+                       configuration.GetSection(DbConnectionConfigs.MongoDBConnectionSetting));
+
+            services.AddSingleton<IMongoDbConnectionSettings>(sp =>
+                        sp.GetRequiredService<IOptions<MongoDbConnectionSettings>>().Value);
+
+            services.AddSingleton<MongoDbContext>();
+
+            return services;
+        }
+
         public static IServiceCollection AddBusinessService(this IServiceCollection services)
         {
             services.AddScoped<BookService>();
@@ -12,7 +28,7 @@ namespace MongoTutorialDemo.Extensions
             return services;
         }
 
-        public static IServiceCollection AddVehicleService(this IServiceCollection services)
+        public static IServiceCollection AddTestService(this IServiceCollection services)
         {
             services.AddScoped<ITestService, ATestService>();
 
