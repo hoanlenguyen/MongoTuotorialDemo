@@ -75,16 +75,16 @@ namespace MongoTutorialDemo.Services
         {
             if (request.CurrentPage == null || request.ItemsPerPage == null)
             {
-                var (item1, count1) = FilteredMongoCollection(filter);
+                var result = FilterMongoCollection(filter);
                 return new PagingResult
                 {
-                    Items = item1,
-                    MaxItemCount = count1
+                    Items = result.Items,
+                    MaxItemCount = result.Count
                 };
             }
             var skipItems = (request.CurrentPage.Value - 1) * request.ItemsPerPage.Value;
 
-            var (items, count) = FilteredMongoCollection(filter, skipItems, request.ItemsPerPage.Value);
+            var (item, count) = FilterMongoCollection(filter, skipItems, request.ItemsPerPage.Value);
 
             //var maxPage = (int)Math.Ceiling((double)count / request.ItemsPerPage.Value);
 
@@ -93,21 +93,22 @@ namespace MongoTutorialDemo.Services
                 CurrentPage = request.CurrentPage,
                 ItemsPerPage = request.ItemsPerPage,
                 MaxItemCount = count,
-                Items = items
+                Items = item
             };
         }
 
-        private (IEnumerable<Book> Items, int Count) FilteredMongoCollection(BookFilter filter, int? skip = null, int? take = null)
+        private (IEnumerable<string> Items, int Count) FilterMongoCollection(BookFilter filter, int? skip = null, int? take = null)
         {
             var items = _books.AsQueryable()
-                        .WhereIf(filter.BookName.HasValue(), x=>x.BookName.Contains(filter.BookName))
-                        .WhereIf(filter.Rate!=null, x => x.Rate >= filter.Rate)
-                        ;
+                              .WhereIf(filter.BookName.HasValue(), x => x.BookName.Contains(filter.BookName))
+                              .WhereIf(filter.Author.HasValue(), x => x.Author.Contains(filter.Author))
+                              .Where(x => filter.Rate == null || x.Rate >= filter.Rate)
 
+                              .OrderBy(filter.SortFieldName, filter.IsAscending)
+                              .Select(x => x.Author)
+                              ;
 
-
-
-            var count = items.Count<Book>();
+            var count = items.Count<string>();
 
             if (skip.HasValue)
                 items = items.Skip(skip.Value);
