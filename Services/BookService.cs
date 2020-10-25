@@ -84,7 +84,7 @@ namespace MongoTutorialDemo.Services
             }
             var skipItems = (request.CurrentPage.Value - 1) * request.ItemsPerPage.Value;
 
-            var (item, count) = FilteredMongoCollection(filter, skipItems, request.ItemsPerPage.Value);
+            var (items, count) = FilteredMongoCollection(filter, skipItems, request.ItemsPerPage.Value);
 
             //var maxPage = (int)Math.Ceiling((double)count / request.ItemsPerPage.Value);
 
@@ -93,7 +93,7 @@ namespace MongoTutorialDemo.Services
                 CurrentPage = request.CurrentPage,
                 ItemsPerPage = request.ItemsPerPage,
                 MaxItemCount = count,
-                Items = item
+                Items = items
             };
         }
 
@@ -101,8 +101,11 @@ namespace MongoTutorialDemo.Services
         {
             var items = _books.AsQueryable()
                         .WhereIf(filter.BookName.HasValue(), x=>x.BookName.Contains(filter.BookName))
-                        .Where(x => filter.Rate == null || x.Rate >= filter.Rate)
+                        .WhereIf(filter.Rate!=null, x => x.Rate >= filter.Rate)
                         ;
+
+
+
 
             var count = items.Count<Book>();
 
